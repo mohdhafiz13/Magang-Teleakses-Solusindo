@@ -120,15 +120,43 @@
           ></v-list-item>
         </v-list-group>
 
-        <!-- OUTBOUND -->
-        <v-list-subheader class="text-caption font-weight-bold text-grey mt-4">OUTBOUND</v-list-subheader>
-        <v-list-item 
-          to="/outbound" 
-          prepend-icon="mdi-phone-outgoing-outline" 
-          title="Outbound" 
-          value="outbound" 
-          rounded="lg"
-        ></v-list-item>
+       <!-- OUTBOUND -->
+        <v-list-subheader class="text-caption font-weight-bold text-grey mt-4">
+              OUTBOUND
+        </v-list-subheader>
+
+        <v-list-group value="outbound">
+
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              prepend-icon="mdi-phone-outgoing-outline"
+              title="Outbound"
+              rounded="lg"
+            ></v-list-item>
+          </template>
+          <v-list-item
+            to="/outbound"
+            title="Upload Outbound"
+            value="upload-outbound"
+            rounded="lg"
+            class="pl-8"
+          ></v-list-item>
+          <v-list-item
+            to="/upload-report"
+            title="Upload Report"
+            value="upload-report"
+            rounded="lg"
+            class="pl-8"
+          ></v-list-item>
+          <v-list-item
+            to="/outbound-call"
+            title="Outbound Call"
+            value="outbound-call"
+            rounded="lg"
+            class="pl-8"
+          ></v-list-item>
+        </v-list-group>
 
         <!-- MANAGEMENT -->
         <v-list-subheader class="text-caption font-weight-bold text-grey mt-4">MANAGEMENT</v-list-subheader>

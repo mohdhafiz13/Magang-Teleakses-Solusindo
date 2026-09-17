@@ -63,6 +63,26 @@ const routes = [
   meta: { requiresAuth: true },
 },
 {
+  path: '/outbound',
+  name: 'Outbound',
+  component: () => import('../views/OutboundView.vue'),
+  meta: { requiresAuth: true },
+},
+
+{
+  path: '/upload-report',
+  name: 'UploadReport',
+  component: () => import('../views/UploadReportView.vue'),
+  meta: { requiresAuth: true },
+},
+
+{
+  path: '/outbound-call',
+  name: 'OutboundCall',
+  component: () => import('../views/OutboundCallView.vue'),
+  meta: { requiresAuth: true },
+},
+{
   path: '/management-campaign',
   name: 'ManagementCampaign',
   component: () => import('../views/ManagementCampaignView.vue'),

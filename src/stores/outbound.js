@@ -70,29 +70,63 @@ export const useOutboundStore = defineStore('outbound', {
     pendingCall: (state) =>
       state.outboundCalls.filter(
         call => call.status === 'PENDING'
-      ).length
-  },
+      ).length,
+
+      totalCustomer: (state) =>
+        state.customers.length,
+
+        waitingCustomer: (state) =>
+        state.customers.filter(
+            customer => customer.status === 'WAITING'
+        ).length,
+    },
 
   actions: {
-    addOutboundCall(call) {
-      this.outboundCalls.push(call)
-    },
 
-    updateCallStatus(id, status) {
-      const call = this.outboundCalls.find(
-        item => item.id === id
+  addOutboundCall(call) {
+    this.outboundCalls.push(call)
+  },
+
+
+  addCustomers(customers) {
+    this.customers.push(...customers)
+  },
+
+
+  updateCustomerStatus(id, status) {
+
+    const customer = this.customers.find(
+      item => item.id === id
+    )
+
+    if(customer){
+      customer.status = status
+    }
+
+  },
+
+
+  updateCallStatus(id, status) {
+
+    const call = this.outboundCalls.find(
+      item => item.id === id
+    )
+
+    if(call){
+      call.status = status
+    }
+
+  },
+
+
+  deleteOutboundCall(id) {
+
+    this.outboundCalls =
+      this.outboundCalls.filter(
+        call => call.id !== id
       )
 
-      if (call) {
-        call.status = status
-      }
-    },
-
-    deleteOutboundCall(id) {
-      this.outboundCalls =
-        this.outboundCalls.filter(
-          call => call.id !== id
-        )
-    }
   }
+
+}
 })
