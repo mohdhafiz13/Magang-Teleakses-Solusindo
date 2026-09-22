@@ -20,9 +20,23 @@ const routes = [
     component: () => import('../views/AgentPanelView.vue'),
     meta: { requiresAuth: true },
   },
+
+  // --- REPORTING SECTION ---
   {
     path: '/agent-reporting',
     name: 'AgentReporting',
+    redirect: '/agent-statistics',
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/agent-statistics',
+    name: 'AgentStatistics',
+    component: () => import('../views/AgentReportingView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/agent-history',
+    name: 'AgentHistory',
     component: () => import('../views/AgentReportingView.vue'),
     meta: { requiresAuth: true },
   },
@@ -56,30 +70,34 @@ const routes = [
     component: () => import('../views/ConversationReportingView.vue'),
     meta: { requiresAuth: true },
   },
+
+  // --- OUTBOUND SECTION ---
   {
-  path: '/outbound',
-  name: 'Outbound',
-  component: () => import('../views/OutboundView.vue'),
-  meta: { requiresAuth: true },
-},
-{
-  path: '/management-campaign',
-  name: 'ManagementCampaign',
-  component: () => import('../views/ManagementCampaignView.vue'),
-  meta: { requiresAuth: true },
-},
-{
-  path: '/management-agent',
-  name: 'ManagementAgent',
-  component: () => import('../views/ManagementAgentView.vue'),
-  meta: { requiresAuth: true },
-},
-{
-  path: '/management-summary',
-  name: 'ManagementSummary',
-  component: () => import('../views/ManagementSummaryView.vue'),
-  meta: { requiresAuth: true },
-},
+    path: '/outbound',
+    name: 'Outbound',
+    component: () => import('../views/OutboundView.vue'),
+    meta: { requiresAuth: true },
+  },
+
+  // --- MANAGEMENT SECTION ---
+  {
+    path: '/management-campaign',
+    name: 'ManagementCampaign',
+    component: () => import('../views/ManagementCampaignView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/management-agent',
+    name: 'ManagementAgent',
+    component: () => import('../views/ManagementAgentView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/management-summary',
+    name: 'ManagementSummary',
+    component: () => import('../views/ManagementSummaryView.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

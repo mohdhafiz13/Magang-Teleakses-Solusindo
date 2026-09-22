@@ -8,26 +8,21 @@
       elevation="0"
       class="border-e"
     >
-      <!-- Header Sidebar: Logo TelAccess, Judul & Icon Custom Figma -->
+      <!-- Header Sidebar: Logo TelAccess & Icon Toggle -->
       <div class="pa-4 d-flex align-center justify-space-between border-b">
         <div class="d-flex align-center ga-3">
-          <!-- Logo TelAccess (Diperbaiki agar pasti muncul) -->
           <img :src="logoImage" alt="TelAccess Logo" style="height: 32px; width: auto; object-fit: contain;" />
           <span class="font-weight-bold text-subtitle-1 text-grey-darken-4">Supervisor ACD</span>
         </div>
 
-        <!-- SVG Icon Toggle Sidebar Presisi Figma (Kotak dengan Panah Kiri) -->
         <button 
           class="sidebar-toggle-btn d-flex align-center justify-center rounded pa-1"
           @click="drawer = !drawer"
           title="Toggle Sidebar"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Outlined Box -->
             <rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect>
-            <!-- Vertical Divider Line -->
             <line x1="9" y1="3" x2="9" y2="21"></line>
-            <!-- Left Arrow inside box -->
             <polyline points="15 9 12 12 15 15"></polyline>
           </svg>
         </button>
@@ -65,8 +60,19 @@
             ></v-list-item>
           </template>
 
+          <!-- SUBMENU 1: Agent Statistics -->
           <v-list-item
-            to="/agent-reporting"
+            to="/agent-statistics"
+            title="Agent Statistics"
+            value="agent-statistics"
+            active-color="primary"
+            rounded="lg"
+            class="pl-8"
+          ></v-list-item>
+
+          <!-- SUBMENU 2: Agent History -->
+          <v-list-item
+            to="/agent-history"
             title="Agent History"
             value="agent-history"
             active-color="primary"
@@ -158,7 +164,6 @@
 
     <!-- Top Header Bar -->
     <v-app-bar app flat class="border-b bg-white px-4">
-      <!-- Tombol Toggle Kiri (Tampil Jika Sidebar Tertutup) -->
       <button 
         v-if="!drawer"
         class="sidebar-toggle-btn d-flex align-center justify-center rounded pa-1"
