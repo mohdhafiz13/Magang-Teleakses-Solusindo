@@ -120,6 +120,15 @@
               </span>
             </v-chip>
 
+            <v-chip
+              v-else-if="item.status === 'WAITING'"
+              color="warning"
+              size="small"
+            >
+              <span class="dot">●</span>
+              WAITING
+            </v-chip>
+
             <v-chip v-else color="error" size="small">
               <span class="dot">●</span>
               Not Answered
