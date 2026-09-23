@@ -11,4 +11,13 @@
 
 <script setup>
 import DefaultLayout from '../layouts/DefaultLayout.vue'
+import { useCampaignStore } from '../stores/campaign'
+
+const campaignStore = useCampaignStore()
+
+console.log('Management Campaign Loaded')
+console.log('Campaign Data:', campaignStore.campaigns)
+console.log('Total Campaign:', campaignStore.totalCampaign)
+console.log('Active Campaign:', campaignStore.activeCampaign)
+console.log('Outbound Campaign:', campaignStore.outboundCampaign)
 </script>
