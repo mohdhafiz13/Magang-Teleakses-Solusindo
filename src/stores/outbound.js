@@ -136,6 +136,36 @@ export const useOutboundStore = defineStore("outbound", {
 
     addCustomers(customers) {
       this.customers.push(...customers);
+
+      customers.forEach((customer) => {
+        this.outboundCalls.push({
+          id: Date.now(),
+
+          actionId: "-",
+
+          phone: customer.phone,
+
+          campaign: customer.campaign || "marketing",
+
+          uploadedTime: new Date().toLocaleString(),
+
+          updatedTime: new Date().toLocaleString(),
+
+          status: "WAITING",
+
+          callCount: 0,
+
+          salary: "-",
+
+          script: "-",
+
+          location: "-",
+
+          fullName: customer.name,
+
+          jobPosition: "-",
+        });
+      });
     },
 
     updateCustomerStatus(id, status) {
