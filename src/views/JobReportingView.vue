@@ -10,7 +10,7 @@
     <v-card elevation="0" class="border custom-rounded pa-5 mb-5 bg-white">
       <v-row density="compact" class="align-center mb-4">
         <!-- Date Range -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" :md="activeTab === 'call' ? 4 : 6">
           <label class="text-caption font-weight-bold text-grey-darken-1 mb-1 d-flex align-center gap-1">
             <v-icon icon="mdi-calendar-outline" size="16" color="primary"></v-icon>
             Date Range
@@ -38,8 +38,8 @@
           </v-menu>
         </v-col>
 
-        <!-- Input -->
-        <v-col cols="12" md="4">
+        <!-- Input Search Customer Number -->
+        <v-col cols="12" :md="activeTab === 'call' ? 4 : 6">
           <label class="text-caption font-weight-bold text-grey-darken-1 mb-1 d-flex align-center gap-1">
             <v-icon icon="mdi-account-search-outline" size="16" color="primary"></v-icon>
             Input
@@ -52,11 +52,12 @@
             density="compact"
             hide-details
             rounded="lg"
+            clearable
           ></v-text-field>
         </v-col>
 
-        <!-- Campaign -->
-        <v-col cols="12" md="4">
+        <!-- Campaign (HANYA TAMPIL SAAT MODE CALL) -->
+        <v-col v-if="activeTab === 'call'" cols="12" md="4">
           <label class="text-caption font-weight-bold text-grey-darken-1 mb-1 d-flex align-center gap-1">
             <v-icon icon="mdi-bullhorn-outline" size="16" color="primary"></v-icon>
             Campaign
@@ -119,39 +120,21 @@
     </div>
 
     <!-- 3. SECTION: LAST STATUS JOB (MODE CALL vs CHAT) -->
-    <!-- ==================== MODE CALL ==================== -->
     <v-row v-if="activeTab === 'call'" class="mb-6" align="stretch">
       <!-- Donut Chart & Legend Kiri -->
       <v-col cols="12" lg="5">
-        <v-card elevation="0" class="border custom-rounded bg-white fill-height d-flex flex-column">
-          <div class="d-flex align-center gap-2 pa-5 pb-3">
-            <div class="accent-bar"></div>
-            <span class="text-subtitle-2 font-weight-bold text-grey-darken-4">Last Status Job Call</span>
-          </div>
-          <v-divider></v-divider>
-
-          <div class="d-flex align-center justify-space-between pa-5 flex-grow-1" style="min-height: 240px;">
-            <!-- Legend List -->
-            <div class="d-flex flex-column gap-3" style="min-width: 140px;">
-              <div v-for="(item, idx) in callLegend" :key="idx" class="d-flex align-center">
-                <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                <span class="text-caption font-weight-regular text-grey-darken-3">{{ item.label }}</span>
-              </div>
-            </div>
-
-            <!-- Donut Chart Center -->
-            <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center" style="height: 220px;">
-              <Doughnut :data="callChartData" :options="chartOptions" />
-              <div class="center-text text-center">
-                <div class="text-h6 font-weight-bold leading-tight">1,401</div>
-                <div class="text-caption text-grey">Total Jobs</div>
-              </div>
-            </div>
-          </div>
-        </v-card>
+        <DoughnutChartCard
+          title="Last Status Job Call"
+          subtitle="View the latest status of call-related jobs."
+          center-text="1,401"
+          :legend-items="callLegend"
+          :chart-data="callChartData"
+          :options="chartOptions"
+          height="220px"
+        />
       </v-col>
 
-      <!-- Grid 5 Metric Cards Kanan -->
+      <!-- Metric Cards Call -->
       <v-col cols="12" lg="7">
         <div class="border custom-rounded pa-6 bg-grey-lighten-4 fill-height d-flex align-center">
           <v-row density="comfortable" class="w-100">
@@ -189,33 +172,18 @@
       </v-col>
     </v-row>
 
-    <!-- ==================== MODE CHAT ==================== -->
+    <!-- MODE CHAT -->
     <v-row v-else class="mb-6" align="stretch">
       <v-col cols="12" lg="5">
-        <v-card elevation="0" class="border custom-rounded bg-white fill-height d-flex flex-column">
-          <div class="d-flex align-center gap-2 pa-5 pb-3">
-            <div class="accent-bar"></div>
-            <span class="text-subtitle-2 font-weight-bold text-grey-darken-4">Last Status Job Chat</span>
-          </div>
-          <v-divider></v-divider>
-
-          <div class="d-flex align-center justify-space-between pa-5 flex-grow-1" style="min-height: 240px;">
-            <div class="d-flex flex-column gap-3" style="min-width: 140px;">
-              <div v-for="(item, idx) in chatLegend" :key="idx" class="d-flex align-center">
-                <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                <span class="text-caption font-weight-regular text-grey-darken-3">{{ item.label }}</span>
-              </div>
-            </div>
-
-            <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center" style="height: 220px;">
-              <Doughnut :data="chatChartData" :options="chartOptions" />
-              <div class="center-text text-center">
-                <div class="text-h6 font-weight-bold leading-tight">1,145</div>
-                <div class="text-caption text-grey">Total Jobs</div>
-              </div>
-            </div>
-          </div>
-        </v-card>
+        <DoughnutChartCard
+          title="Last Status Job Chat"
+          subtitle="View the latest status of chat-related jobs."
+          center-text="1,145"
+          :legend-items="chatLegend"
+          :chart-data="chatChartData"
+          :options="chartOptions"
+          height="220px"
+        />
       </v-col>
 
       <v-col cols="12" lg="7">
@@ -263,12 +231,14 @@
           <span class="text-subtitle-2 font-weight-bold text-grey-darken-4">Job Records</span>
         </div>
 
+        <!-- Tombol Download CSV Tabel -->
         <v-btn
           variant="outlined"
           color="success"
           rounded="lg"
           prepend-icon="mdi-download"
           class="text-none font-weight-bold"
+          @click="handleDownload"
         >
           Download
         </v-btn>
@@ -293,7 +263,7 @@
         v-model:page="page"
         v-model:items-per-page="itemsPerPage"
         :headers="activeTab === 'call' ? callTableHeaders : chatTableHeaders"
-        :items="activeTab === 'call' ? callJobRecords : chatJobRecords"
+        :items="filteredJobRecords"
         hide-default-footer
         density="comfortable"
         class="elevation-0 border-top"
@@ -324,20 +294,20 @@
           </v-btn>
         </template>
 
+        <!-- CustomPagination Child Component -->
         <template v-slot:bottom>
           <CustomPagination
             v-model:page="page"
             v-model:itemsPerPage="itemsPerPage"
-            :total-items="1250"
+            :total-items="filteredJobRecords.length"
           />
         </template>
       </v-data-table>
     </v-card>
 
-    <!-- ================= MODAL DIALOG: JOB DETAIL (PERSIS ICON & DESAIN FIGMA) ================= -->
+    <!-- ================= MODAL DIALOG: JOB DETAIL ================= -->
     <v-dialog v-model="dialogDetail" max-width="660" persistent scrollable>
       <v-card class="rounded-2xl pa-6 bg-white elevation-12">
-        <!-- Dialog Header dengan Icon Dokumen Lingkaran Biru -->
         <div class="d-flex align-start justify-space-between mb-6">
           <div class="d-flex align-center ga-3">
             <v-avatar color="blue-lighten-5" size="48" rounded="circle">
@@ -352,43 +322,22 @@
         </div>
 
         <v-card-text class="pa-0">
-          <!-- 1. Audio Player Recording Bar -->
           <div class="d-flex align-center pa-4 mb-6 rounded-xl border bg-grey-lighten-5 ga-2">
             <v-btn icon size="small" color="primary" elevation="0" class="mr-2 flex-shrink-0" @click="isPlaying = !isPlaying">
               <v-icon :icon="isPlaying ? 'mdi-pause' : 'mdi-play'"></v-icon>
             </v-btn>
-            
             <span class="text-caption font-weight-medium text-grey-darken-2 flex-shrink-0">0:00</span>
-            
-            <v-slider 
-              v-model="audioProgress" 
-              hide-details 
-              density="compact" 
-              color="primary" 
-              class="flex-grow-1 mx-3"
-            ></v-slider>
-            
+            <v-slider v-model="audioProgress" hide-details density="compact" color="primary" class="flex-grow-1 mx-3"></v-slider>
             <span class="text-caption font-weight-medium text-grey-darken-2 mr-3 flex-shrink-0">12:34</span>
-            
             <v-btn icon variant="text" size="small" color="grey-darken-2" class="flex-shrink-0">
               <v-icon icon="mdi-volume-high"></v-icon>
             </v-btn>
-            
-            <v-slider 
-              v-model="audioVolume" 
-              hide-details 
-              density="compact" 
-              color="primary" 
-              style="max-width: 65px;" 
-              class="mr-3 flex-shrink-0"
-            ></v-slider>
-            
+            <v-slider v-model="audioVolume" hide-details density="compact" color="primary" style="max-width: 65px;" class="mr-3 flex-shrink-0"></v-slider>
             <v-btn variant="outlined" color="primary" size="small" rounded="lg" prepend-icon="mdi-download" class="text-none font-weight-bold flex-shrink-0">
               Download
             </v-btn>
           </div>
 
-          <!-- 2. Job Information Card -->
           <div class="mb-6">
             <div class="d-flex align-center gap-2 mb-3">
               <div class="accent-bar"></div>
@@ -402,25 +351,21 @@
                   <span class="text-grey-darken-1" style="min-width: 120px;">Campaign</span>
                   <span class="font-weight-bold text-grey-darken-4">: {{ selectedJob?.campaign || 'lang_id' }}</span>
                 </v-col>
-
                 <v-col cols="12" sm="6" class="d-flex align-center">
                   <v-icon icon="mdi-account-outline" size="18" class="mr-3 text-grey-darken-1"></v-icon>
                   <span class="text-grey-darken-1" style="min-width: 100px;">Agent</span>
                   <span class="font-weight-bold text-grey-darken-4">: {{ selectedJob?.agent || 'Agent Rani' }}</span>
                 </v-col>
-
                 <v-col cols="12" sm="6" class="d-flex align-center">
                   <v-icon icon="mdi-phone-outline" size="18" class="mr-3 text-grey-darken-1"></v-icon>
                   <span class="text-grey-darken-1" style="min-width: 120px;">Customer Number</span>
                   <span class="font-weight-bold text-grey-darken-4">: {{ selectedJob?.customerNumber || 'WRTC14' }}</span>
                 </v-col>
-
                 <v-col cols="12" sm="6" class="d-flex align-center">
                   <v-icon icon="mdi-clock-outline" size="18" class="mr-3 text-grey-darken-1"></v-icon>
                   <span class="text-grey-darken-1" style="min-width: 100px;">Duration</span>
                   <span class="font-weight-bold text-grey-darken-4">: {{ selectedJob?.duration || '00:05:03' }}</span>
                 </v-col>
-
                 <v-col cols="12" class="d-flex align-center">
                   <v-icon icon="mdi-calendar-clock-outline" size="18" class="mr-3 text-grey-darken-1"></v-icon>
                   <span class="text-grey-darken-1" style="min-width: 120px;">Date & Time</span>
@@ -430,15 +375,12 @@
             </div>
           </div>
 
-          <!-- 3. Last Status Job Timeline -->
           <div>
             <div class="d-flex align-center gap-2 mb-3">
               <div class="accent-bar"></div>
               <span class="text-subtitle-2 font-weight-bold text-grey-darken-4">Last Status Job</span>
             </div>
-            
             <div class="d-flex flex-column ga-3 text-caption">
-              <!-- Item 1: DONE -->
               <div class="d-flex align-center justify-space-between pa-4 rounded-xl border bg-grey-lighten-5 ga-4">
                 <v-chip color="green-lighten-4" class="text-green-darken-3 font-weight-bold flex-shrink-0" size="small" variant="flat">
                   ● DONE
@@ -446,8 +388,6 @@
                 <span class="text-grey-darken-2 font-weight-medium flex-shrink-0">11 Sep 2026 15:03:24</span>
                 <span class="text-grey-darken-1 text-right flex-grow-1">Jobs has been completed.</span>
               </div>
-
-              <!-- Item 2: IN_SERVICE -->
               <div class="d-flex align-center justify-space-between pa-4 rounded-xl border bg-grey-lighten-5 ga-4">
                 <v-chip color="blue-lighten-4" class="text-blue-darken-3 font-weight-bold flex-shrink-0" size="small" variant="flat">
                   ● IN_SERVICE
@@ -455,8 +395,6 @@
                 <span class="text-grey-darken-2 font-weight-medium flex-shrink-0">11 Sep 2026 15:03:24</span>
                 <span class="text-grey-darken-1 text-right flex-grow-1">Agent is handling the conversation with customer.</span>
               </div>
-
-              <!-- Item 3: IN_QUEUE -->
               <div class="d-flex align-center justify-space-between pa-4 rounded-xl border bg-grey-lighten-5 ga-4">
                 <v-chip color="amber-lighten-4" class="text-amber-darken-3 font-weight-bold flex-shrink-0" size="small" variant="flat">
                   ● IN_QUEUE
@@ -476,10 +414,7 @@
 import { ref, computed } from 'vue'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import CustomPagination from '../components/CustomPagination.vue'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
-import { Doughnut } from 'vue-chartjs'
-
-ChartJS.register(Title, Tooltip, Legend, ArcElement)
+import DoughnutChartCard from '../components/DoughnutChartCard.vue'
 
 const activeTab = ref('call')
 
@@ -598,6 +533,54 @@ const chatJobRecords = ref([
   { no: 5, customerNumber: 'WRTC08', dateTime: '10 Sep 2026 02:25:09', agent: 'Agent Zahra', duration: '00:04:02' }
 ])
 
+// Filter Data Berdasarkan Input Search & Campaign
+const filteredJobRecords = computed(() => {
+  const records = activeTab.value === 'call' ? callJobRecords.value : chatJobRecords.value
+  return records.filter(item => {
+    const matchInput = !filterInput.value || item.customerNumber.toLowerCase().includes(filterInput.value.toLowerCase())
+    const matchCampaign = activeTab.value === 'chat' || filterCampaign.value === 'All Campaign' || item.campaign === filterCampaign.value
+    return matchInput && matchCampaign
+  })
+})
+
+// FUNGSI UTAMA DOWNLOAD FILE CSV
+const handleDownload = () => {
+  const currentRecords = filteredJobRecords.value
+  const currentHeaders = activeTab.value === 'call' ? callTableHeaders : chatTableHeaders
+  const filename = activeTab.value === 'call' ? 'Job_Reporting_Call.csv' : 'Job_Reporting_Chat.csv'
+
+  if (!currentRecords || currentRecords.length === 0) {
+    alert('Tidak ada data untuk di-download!')
+    return
+  }
+
+  // 1. Ekstrak Header (Kecuali Kolom Action)
+  const validHeaders = currentHeaders.filter(h => h.key !== 'action')
+  const headerRow = validHeaders.map(h => `"${h.title}"`).join(',')
+
+  // 2. Format Baris Data
+  const dataRows = currentRecords.map(row => {
+    return validHeaders
+      .map(h => {
+        let val = row[h.key]
+        val = val !== undefined && val !== null ? val : ''
+        return `"${String(val).replace(/"/g, '""')}"`
+      })
+      .join(',')
+  })
+
+  // 3. Gabungkan & Trigger Download
+  const csvContent = '\uFEFF' + [headerRow, ...dataRows].join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', filename)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 const getStatusColor = (status) => {
   switch (status) {
     case 'DONE': return 'green-lighten-4 text-green-darken-3'
@@ -623,8 +606,6 @@ const openDetailModal = (item) => {
 
 <style scoped>
 .accent-bar { width: 3px; height: 16px; background-color: #1E75FF; border-radius: 2px; }
-.legend-box { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
-.center-text { position: absolute; pointer-events: none; }
 .leading-tight { line-height: 1.1; }
 
 .custom-rounded {

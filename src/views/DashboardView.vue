@@ -5,7 +5,7 @@
       <h1 class="text-h5 font-weight-bold mb-1">Monitoring Panel</h1>
       <p class="text-caption text-grey">Monitor agent activity and operational status in real-time</p>
 
-      <!-- Toggle Mode Switch Call vs Chat Berjarak & Outlined -->
+      <!-- Toggle Mode Switch Call vs Chat -->
       <div class="d-flex ga-3 mt-4">
         <v-btn
           :variant="activeTab === 'call' ? 'flat' : 'outlined'"
@@ -37,89 +37,35 @@
       <div class="text-subtitle-1 font-weight-bold mb-1">Call Overview</div>
       <p class="text-caption text-grey mb-3">Real-time call activity and agent status.</p>
       
-      <!-- Summary Cards Call -->
-      <v-row class="mb-6">
-        <v-col cols="12" sm="4" md="2" v-for="(card, i) in callOverviewCards" :key="i">
-          <v-card elevation="0" class="border rounded-xl pa-4 bg-white">
-            <div class="d-flex align-center gap-2 mb-3">
-              <v-avatar :color="card.bgColor" size="28" rounded="lg">
-                <v-icon :icon="card.icon" :color="card.iconColor" size="16"></v-icon>
-              </v-avatar>
-              <span class="text-caption font-weight-bold text-grey-darken-2">{{ card.title }}</span>
-            </div>
-            <div class="text-h4 font-weight-bold">{{ card.value }}</div>
-          </v-card>
-        </v-col>
-      </v-row>
+      <!-- Summary Cards Call (Pakai Child Component) -->
+      <SummaryCards :items="callOverviewCards" :col-width="2" />
 
-      <!-- Section Charts Call -->
+      <!-- Section Charts Call (Pakai Child Component) -->
       <v-row class="mb-6">
         <!-- Call Status Donut Chart -->
         <v-col cols="12" md="6">
-          <v-card elevation="0" class="border rounded-xl pa-5 bg-white">
-            <div class="d-flex align-center justify-space-between mb-4">
-              <div class="d-flex align-center gap-2">
-                <div class="accent-bar"></div>
-                <span class="text-subtitle-2 font-weight-bold">Call Status</span>
-              </div>
-              <v-select
-                v-model="callStatusFilter"
-                :items="['All', 'Today', 'This Week']"
-                variant="outlined"
-                density="compact"
-                hide-details
-                style="max-width: 110px;"
-                class="text-caption rounded-lg"
-              ></v-select>
-            </div>
-
-            <div class="d-flex align-center" style="height: 240px;">
-              <div class="d-flex flex-column gap-3 mr-6" style="min-width: 150px;">
-                <div v-for="(item, idx) in callStatusLegend" :key="idx" class="d-flex align-center">
-                  <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                  <span class="text-caption text-grey-darken-2 font-weight-medium">{{ item.label }}</span>
-                </div>
-              </div>
-              <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center">
-                <Doughnut :data="callStatusChartData" :options="chartOptions" />
-                <div class="center-text text-subtitle-2 font-weight-bold">IN_IVR</div>
-              </div>
-            </div>
-          </v-card>
+          <DoughnutChartCard
+            title="Call Status"
+            center-text="IN_IVR"
+            :legend-items="callStatusLegend"
+            :chart-data="callStatusChartData"
+            :options="chartOptions"
+            v-model:filter-value="callStatusFilter"
+            :filter-options="['All', 'Today', 'This Week']"
+          />
         </v-col>
 
         <!-- Agent Status Donut Chart -->
         <v-col cols="12" md="6">
-          <v-card elevation="0" class="border rounded-xl pa-5 bg-white">
-            <div class="d-flex align-center justify-space-between mb-4">
-              <div class="d-flex align-center gap-2">
-                <div class="accent-bar"></div>
-                <span class="text-subtitle-2 font-weight-bold">Agent Status</span>
-              </div>
-              <v-select
-                v-model="agentStatusFilter"
-                :items="['All', 'Active', 'Inactive']"
-                variant="outlined"
-                density="compact"
-                hide-details
-                style="max-width: 110px;"
-                class="text-caption rounded-lg"
-              ></v-select>
-            </div>
-
-            <div class="d-flex align-center" style="height: 240px;">
-              <div class="d-flex flex-column gap-2 mr-6" style="min-width: 150px;">
-                <div v-for="(item, idx) in agentStatusLegend" :key="idx" class="d-flex align-center">
-                  <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                  <span class="text-caption text-grey-darken-2 font-weight-medium">{{ item.label }}</span>
-                </div>
-              </div>
-              <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center">
-                <Doughnut :data="agentStatusChartData" :options="chartOptions" />
-                <div class="center-text text-subtitle-2 font-weight-bold">READY</div>
-              </div>
-            </div>
-          </v-card>
+          <DoughnutChartCard
+            title="Agent Status"
+            center-text="READY"
+            :legend-items="agentStatusLegend"
+            :chart-data="agentStatusChartData"
+            :options="chartOptions"
+            v-model:filter-value="agentStatusFilter"
+            :filter-options="['All', 'Active', 'Inactive']"
+          />
         </v-col>
       </v-row>
 
@@ -197,6 +143,22 @@
               {{ item.status }}
             </v-chip>
           </template>
+
+          <!-- Action Tombol Spy -->
+          <template v-slot:item.action="{ item }">
+            <v-btn
+              size="x-small"
+              color="primary"
+              variant="outlined"
+              rounded="md"
+              prepend-icon="mdi-eye-outline"
+              class="text-none font-weight-bold"
+              @click="openSpyModal(item)"
+            >
+              Spy
+            </v-btn>
+          </template>
+
           <template v-slot:bottom>
             <CustomPagination
               v-model:page="pageListAgent"
@@ -213,87 +175,35 @@
       <div class="text-subtitle-1 font-weight-bold mb-1">Chat Overview</div>
       <p class="text-caption text-grey mb-3">Real-time chat activity and agent status.</p>
 
-      <v-row class="mb-6">
-        <v-col cols="12" md="4" v-for="(card, i) in chatOverviewCards" :key="i">
-          <v-card elevation="0" class="border rounded-xl pa-4 bg-white">
-            <div class="d-flex align-center gap-2 mb-3">
-              <v-avatar :color="card.bgColor" size="28" rounded="lg">
-                <v-icon :icon="card.icon" :color="card.iconColor" size="16"></v-icon>
-              </v-avatar>
-              <span class="text-caption font-weight-bold text-grey-darken-2">{{ card.title }}</span>
-            </div>
-            <div class="text-h4 font-weight-bold">{{ card.value }}</div>
-          </v-card>
-        </v-col>
-      </v-row>
+      <!-- Summary Cards Chat (Pakai Child Component) -->
+      <SummaryCards :items="chatOverviewCards" :col-width="4" />
 
+      <!-- Section Charts Chat (Pakai Child Component) -->
       <v-row class="mb-6">
         <!-- Chat Status Donut Chart -->
         <v-col cols="12" md="6">
-          <v-card elevation="0" class="border rounded-xl pa-5 bg-white">
-            <div class="d-flex align-center justify-space-between mb-4">
-              <div class="d-flex align-center gap-2">
-                <div class="accent-bar"></div>
-                <span class="text-subtitle-2 font-weight-bold">Chat Status</span>
-              </div>
-              <v-select
-                v-model="chatStatusFilter"
-                :items="['All', 'Today', 'This Week']"
-                variant="outlined"
-                density="compact"
-                hide-details
-                style="max-width: 110px;"
-                class="text-caption rounded-lg"
-              ></v-select>
-            </div>
-
-            <div class="d-flex align-center" style="height: 240px;">
-              <div class="d-flex flex-column gap-4 mr-6" style="min-width: 160px;">
-                <div v-for="(item, idx) in chatStatusLegend" :key="idx" class="d-flex align-center">
-                  <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                  <span class="text-caption text-grey-darken-2 font-weight-medium">{{ item.label }}</span>
-                </div>
-              </div>
-              <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center">
-                <Doughnut :data="chatStatusChartData" :options="chartOptions" />
-                <div class="center-text text-subtitle-2 font-weight-bold">Chat Bot</div>
-              </div>
-            </div>
-          </v-card>
+          <DoughnutChartCard
+            title="Chat Status"
+            center-text="Chat Bot"
+            :legend-items="chatStatusLegend"
+            :chart-data="chatStatusChartData"
+            :options="chartOptions"
+            v-model:filter-value="chatStatusFilter"
+            :filter-options="['All', 'Today', 'This Week']"
+          />
         </v-col>
 
         <!-- Chat Agent Status Donut Chart -->
         <v-col cols="12" md="6">
-          <v-card elevation="0" class="border rounded-xl pa-5 bg-white">
-            <div class="d-flex align-center justify-space-between mb-4">
-              <div class="d-flex align-center gap-2">
-                <div class="accent-bar"></div>
-                <span class="text-subtitle-2 font-weight-bold">Chat Agent Status</span>
-              </div>
-              <v-select
-                v-model="chatAgentStatusFilter"
-                :items="['All', 'Active', 'Inactive']"
-                variant="outlined"
-                density="compact"
-                hide-details
-                style="max-width: 110px;"
-                class="text-caption rounded-lg"
-              ></v-select>
-            </div>
-
-            <div class="d-flex align-center" style="height: 240px;">
-              <div class="d-flex flex-column gap-4 mr-6" style="min-width: 160px;">
-                <div v-for="(item, idx) in chatAgentStatusLegend" :key="idx" class="d-flex align-center">
-                  <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                  <span class="text-caption text-grey-darken-2 font-weight-medium">{{ item.label }}</span>
-                </div>
-              </div>
-              <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center">
-                <Doughnut :data="chatAgentStatusChartData" :options="chartOptions" />
-                <div class="center-text text-subtitle-2 font-weight-bold">LOGGED OUT</div>
-              </div>
-            </div>
-          </v-card>
+          <DoughnutChartCard
+            title="Chat Agent Status"
+            center-text="LOGGED OUT"
+            :legend-items="chatAgentStatusLegend"
+            :chart-data="chatAgentStatusChartData"
+            :options="chartOptions"
+            v-model:filter-value="chatAgentStatusFilter"
+            :filter-options="['All', 'Active', 'Inactive']"
+          />
         </v-col>
       </v-row>
 
@@ -381,6 +291,9 @@
         </v-data-table>
       </v-card>
     </div>
+
+    <!-- Modal Spy Agent (Pakai Child Component Baru) -->
+    <SpyAgentModal v-model="showSpyModal" :agent-data="selectedAgent" />
   </DefaultLayout>
 </template>
 
@@ -388,12 +301,20 @@
 import { ref, computed } from 'vue'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import CustomPagination from '../components/CustomPagination.vue'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { Doughnut } from 'vue-chartjs'
-
-ChartJS.register(ArcElement, Tooltip, Legend)
+import SummaryCards from '../components/SummaryCards.vue'
+import DoughnutChartCard from '../components/DoughnutChartCard.vue'
+import SpyAgentModal from '../components/SpyAgentModal.vue'
 
 const activeTab = ref('call')
+
+// Spy Modal State
+const showSpyModal = ref(false)
+const selectedAgent = ref(null)
+
+const openSpyModal = (agent) => {
+  selectedAgent.value = agent
+  showSpyModal.value = true
+}
 
 // Search inputs
 const searchOngoingCall = ref('')
@@ -427,20 +348,20 @@ const chartOptions = {
   cutout: '68%'
 }
 
-// Cards Data
+// Cards Data (Disesuaikan untuk Child Component)
 const callOverviewCards = [
-  { title: 'IN_IVR', value: 0, icon: 'mdi-dialpad', bgColor: '#F3E5F5', iconColor: '#8E24AA' },
-  { title: 'IN_SERVICE', value: 2, icon: 'mdi-headset', bgColor: '#E3F2FD', iconColor: '#1E88E5' },
-  { title: 'SERVED', value: 1, icon: 'mdi-phone-incoming', bgColor: '#E8F5E9', iconColor: '#43A047' },
-  { title: 'IN_QUEUE', value: 3, icon: 'mdi-human-queue', bgColor: '#FFF3E0', iconColor: '#FB8C00' },
-  { title: 'NOT_ANSWERED', value: 5, icon: 'mdi-phone-missed', bgColor: '#FFEBEE', iconColor: '#E53935' },
-  { title: 'RINGING', value: 2, icon: 'mdi-phone-ring', bgColor: '#E0F7FA', iconColor: '#00ACC1' },
+  { title: 'IN_IVR', value: 0, icon: 'mdi-dialpad', color: '#8E24AA', bgColor: '#F3E5F5' },
+  { title: 'IN_SERVICE', value: 2, icon: 'mdi-headset', color: '#1E88E5', bgColor: '#E3F2FD' },
+  { title: 'SERVED', value: 1, icon: 'mdi-phone-incoming', color: '#43A047', bgColor: '#E8F5E9' },
+  { title: 'IN_QUEUE', value: 3, icon: 'mdi-human-queue', color: '#FB8C00', bgColor: '#FFF3E0' },
+  { title: 'NOT_ANSWERED', value: 5, icon: 'mdi-phone-missed', color: '#E53935', bgColor: '#FFEBEE' },
+  { title: 'RINGING', value: 2, icon: 'mdi-phone-ring', color: '#00ACC1', bgColor: '#E0F7FA' },
 ]
 
 const chatOverviewCards = [
-  { title: 'Handled by Chat Bot', value: 213, icon: 'mdi-robot-outline', bgColor: '#F3E5F5', iconColor: '#8E24AA' },
-  { title: 'Handled by WA Chat Agent', value: 124, icon: 'mdi-whatsapp', bgColor: '#E8F5E9', iconColor: '#43A047' },
-  { title: 'Handled by Web Chat Agent', value: 134, icon: 'mdi-web', bgColor: '#E0F7FA', iconColor: '#00ACC1' },
+  { title: 'Handled by Chat Bot', value: 213, icon: 'mdi-robot-outline', color: '#8E24AA', bgColor: '#F3E5F5' },
+  { title: 'Handled by WA Chat Agent', value: 124, icon: 'mdi-whatsapp', color: '#43A047', bgColor: '#E8F5E9' },
+  { title: 'Handled by Web Chat Agent', value: 134, icon: 'mdi-web', color: '#00ACC1', bgColor: '#E0F7FA' },
 ]
 
 // Legends & Chart Data
@@ -511,6 +432,7 @@ const listAgentHeaders = [
   { title: 'Name', key: 'name' },
   { title: 'Status Call', key: 'status' },
   { title: 'Campaign', key: 'campaign' },
+  { title: 'Action', key: 'action', sortable: false }, // Kolom Action
 ]
 
 const ongoingChatHeaders = [
@@ -592,19 +514,5 @@ const filteredListAgentChat = computed(() => {
   height: 16px; 
   background-color: #1E75FF; 
   border-radius: 2px; 
-}
-
-.legend-box { 
-  width: 12px; 
-  height: 12px; 
-  border-radius: 3px; 
-  margin-right: 12px !important;
-  flex-shrink: 0;
-}
-
-.center-text { 
-  position: absolute; 
-  pointer-events: none; 
-  color: #212121; 
 }
 </style>

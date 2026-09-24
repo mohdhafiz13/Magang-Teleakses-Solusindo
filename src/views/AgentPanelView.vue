@@ -5,7 +5,7 @@
       <h1 class="text-h5 font-weight-bold mb-1">Agent Panel</h1>
       <p class="text-caption text-grey">Manage and monitor agent status and campaign assignments.</p>
 
-      <!-- Toggle Mode Switch Call vs Chat Berjarak & Outlined -->
+      <!-- Toggle Mode Switch Call vs Chat -->
       <div class="d-flex ga-3 mt-4">
         <v-btn
           :variant="activeTab === 'call' ? 'flat' : 'outlined'"
@@ -34,34 +34,16 @@
 
     <!-- ================= TAB AGENT CALL ================= -->
     <v-card v-if="activeTab === 'call'" elevation="0" class="border rounded-xl pa-6 bg-white">
-      <div class="d-flex align-center justify-space-between mb-6 flex-wrap gap-4">
-        <div>
-          <h2 class="text-subtitle-1 font-weight-bold">Agent Call</h2>
-          <p class="text-caption text-grey mb-0">Manage agent status and campaign assignments for call operations.</p>
-        </div>
-        <!-- Container Flex dengan Jarak Jelas (ga-4 & ml-4) -->
-        <div class="d-flex align-center ga-4">
-          <v-text-field
-            v-model="searchCall"
-            prepend-inner-icon="mdi-magnify"
-            placeholder="Search agent, extension, or campaign..."
-            variant="outlined"
-            density="compact"
-            hide-details
-            rounded="lg"
-            style="min-width: 280px;"
-          ></v-text-field>
-          <v-btn
-            variant="outlined"
-            color="success"
-            rounded="lg"
-            prepend-icon="mdi-download"
-            class="text-none font-weight-bold ml-4"
-          >
-            Download
-          </v-btn>
-        </div>
-      </div>
+      <!-- Child Component Header Tabel Call -->
+      <TableSearchHeader
+        title="Agent Call"
+        subtitle="Manage agent status and campaign assignments for call operations."
+        placeholder="Search agent, extension, or campaign..."
+        v-model:search-value="searchCall"
+        :table-data="filteredCallAgents"
+        :table-headers="callHeaders"
+        filename="Agent_Call_Report.csv"
+      />
 
       <v-data-table
         v-model:page="pageCall"
@@ -127,34 +109,16 @@
 
     <!-- ================= TAB AGENT CHAT ================= -->
     <v-card v-else elevation="0" class="border rounded-xl pa-6 bg-white">
-      <div class="d-flex align-center justify-space-between mb-6 flex-wrap gap-4">
-        <div>
-          <h2 class="text-subtitle-1 font-weight-bold">Agent Chat</h2>
-          <p class="text-caption text-grey mb-0">Monitor chat agent status and availability in real-time.</p>
-        </div>
-        <!-- Container Flex dengan Jarak Jelas (ga-4 & ml-4) -->
-        <div class="d-flex align-center ga-4">
-          <v-text-field
-            v-model="searchChat"
-            prepend-inner-icon="mdi-magnify"
-            placeholder="Search agent or username..."
-            variant="outlined"
-            density="compact"
-            hide-details
-            rounded="lg"
-            style="min-width: 280px;"
-          ></v-text-field>
-          <v-btn
-            variant="outlined"
-            color="success"
-            rounded="lg"
-            prepend-icon="mdi-download"
-            class="text-none font-weight-bold ml-4"
-          >
-            Download
-          </v-btn>
-        </div>
-      </div>
+      <!-- Child Component Header Tabel Chat -->
+      <TableSearchHeader
+        title="Agent Chat"
+        subtitle="Monitor chat agent status and availability in real-time."
+        placeholder="Search agent or username..."
+        v-model:search-value="searchChat"
+        :table-data="filteredChatAgents"
+        :table-headers="chatHeaders"
+        filename="Agent_Chat_Report.csv"
+      />
 
       <v-data-table
         v-model:page="pageChat"
@@ -192,6 +156,7 @@
 import { ref, computed } from 'vue'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import CustomPagination from '../components/CustomPagination.vue'
+import TableSearchHeader from '../components/TableSearchHeader.vue'
 
 const activeTab = ref('call')
 const searchCall = ref('')

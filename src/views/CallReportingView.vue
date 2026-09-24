@@ -69,6 +69,7 @@
             density="compact"
             hide-details
             rounded="lg"
+            clearable
           ></v-text-field>
         </v-col>
 
@@ -125,41 +126,22 @@
       </div>
     </v-card>
 
-    <!-- 2. SECTION: LAST STATUS CALL (LAYOUT KOTAK 100% PERSIS ACUAN GAMBAR BARU) -->
+    <!-- 2. SECTION: LAST STATUS CALL (MENGGUNAKAN CHILD COMPONENT DoughnutChartCard) -->
     <v-row class="mb-6" align="stretch">
       <!-- Donut Chart & Legend Card Kiri -->
       <v-col cols="12" lg="5">
-        <v-card elevation="0" class="border custom-rounded bg-white fill-height d-flex flex-column">
-          <!-- Header Bar Card Donut -->
-          <div class="d-flex align-center gap-2 pa-5 pb-3">
-            <div class="accent-bar"></div>
-            <span class="text-subtitle-2 font-weight-bold text-grey-darken-4">Last Status Call</span>
-          </div>
-          <v-divider></v-divider>
-
-          <!-- Content Chart & Legend -->
-          <div class="d-flex align-center justify-space-between pa-5 flex-grow-1" style="min-height: 240px;">
-            <!-- Legend List -->
-            <div class="d-flex flex-column gap-3" style="min-width: 140px;">
-              <div v-for="(item, idx) in statusLegend" :key="idx" class="d-flex align-center">
-                <div class="legend-box mr-3" :style="{ backgroundColor: item.color }"></div>
-                <span class="text-caption font-weight-regular text-grey-darken-3">{{ item.label }}</span>
-              </div>
-            </div>
-
-            <!-- Donut Chart Center -->
-            <div class="flex-grow-1 position-relative fill-height d-flex justify-center align-center" style="height: 220px;">
-              <Doughnut :data="lastStatusChartData" :options="lastStatusChartOptions" />
-              <div class="center-text text-center">
-                <div class="text-h6 font-weight-bold leading-tight">1,485</div>
-                <div class="text-caption text-grey">Total Calls</div>
-              </div>
-            </div>
-          </div>
-        </v-card>
+        <DoughnutChartCard
+          title="Last Status Call"
+          subtitle="View the latest status of call activities."
+          center-text="1,485"
+          :legend-items="statusLegend"
+          :chart-data="lastStatusChartData"
+          :options="lastStatusChartOptions"
+          height="220px"
+        />
       </v-col>
 
-      <!-- Grid Container Abu-Abu Kanan (6 Metric Cards Sesuai Gambar Acuan Terbaru) -->
+      <!-- Grid Container Abu-Abu Kanan (6 Metric Cards) -->
       <v-col cols="12" lg="7">
         <div class="border custom-rounded pa-6 bg-grey-lighten-4 fill-height d-flex align-center">
           <v-row density="comfortable" class="w-100">
@@ -171,12 +153,10 @@
               >
                 <!-- Row Atas: Icon Kotak Tumpul + Judul Status & Angka Rata Kiri -->
                 <div class="d-flex align-start ga-3 mb-3">
-                  <!-- Icon Kotak Bersudut Tumpul (Rounded Rectangle) -->
                   <v-avatar :color="card.bgColor" size="44" rounded="xl" class="flex-shrink-0">
                     <v-icon :icon="card.icon" :color="card.iconColor" size="22"></v-icon>
                   </v-avatar>
 
-                  <!-- Judul Status & Angka Rata Kiri -->
                   <div class="flex-grow-1">
                     <div class="text-caption font-weight-bold text-grey-darken-2 text-uppercase mb-0" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                       {{ card.title }}
@@ -187,7 +167,7 @@
                   </div>
                 </div>
 
-                <!-- Row Bawah: Persentase & vs previous period Bertumpuk Rata Kiri -->
+                <!-- Row Bawah: Persentase -->
                 <div class="text-caption" style="font-size: 0.78rem; line-height: 1.3;">
                   <div>
                     <span :class="card.isUp ? 'text-success' : 'text-error'" class="font-weight-bold mr-1">
@@ -212,12 +192,14 @@
           <span class="text-subtitle-2 font-weight-bold text-grey-darken-4">Call Records</span>
         </div>
 
+        <!-- Tombol Download CSV -->
         <v-btn
           variant="outlined"
           color="success"
           rounded="lg"
           prepend-icon="mdi-download"
           class="text-none font-weight-bold"
+          @click="handleDownload"
         >
           Download
         </v-btn>
@@ -242,7 +224,7 @@
         v-model:page="page"
         v-model:items-per-page="itemsPerPage"
         :headers="tableHeaders"
-        :items="callRecords"
+        :items="filteredCallRecords"
         hide-default-footer
         density="comfortable"
         class="elevation-0 border-top"
@@ -275,12 +257,12 @@
           </v-btn>
         </template>
 
-        <!-- Custom Pagination Component Figma -->
+        <!-- Custom Pagination Child Component -->
         <template v-slot:bottom>
           <CustomPagination
             v-model:page="page"
             v-model:itemsPerPage="itemsPerPage"
-            :total-items="1250"
+            :total-items="filteredCallRecords.length"
           />
         </template>
       </v-data-table>
@@ -411,10 +393,7 @@
 import { ref, computed } from 'vue'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import CustomPagination from '../components/CustomPagination.vue'
-import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js'
-import { Doughnut } from 'vue-chartjs'
-
-ChartJS.register(Title, Tooltip, Legend, ArcElement)
+import DoughnutChartCard from '../components/DoughnutChartCard.vue'
 
 // Filters State
 const menuDate = ref(false)
@@ -445,7 +424,7 @@ const resetFilters = () => {
   filterAgent.value = 'All Agent'
 }
 
-// Donut Chart Data & Legend (Presisi Warna & Legend Figma)
+// Donut Chart Data & Legend
 const statusLegend = [
   { label: 'IN_IVR', color: '#8B5CF6' },
   { label: 'IN_SERVICE', color: '#2563EB' },
@@ -471,7 +450,7 @@ const lastStatusChartOptions = {
   cutout: '70%'
 }
 
-// 6 Metric Cards Data (Icon MDI Sesuai Foto Acuan)
+// 6 Metric Cards Data
 const metricCards = [
   { title: 'IN_IVR', value: '180', percentage: '10.5', isUp: true, icon: 'mdi-dialpad', bgColor: 'purple-lighten-5', iconColor: 'purple' },
   { title: 'IN_SERVICE', value: '315', percentage: '9.4', isUp: true, icon: 'mdi-clock-outline', bgColor: 'blue-lighten-5', iconColor: 'blue' },
@@ -507,6 +486,53 @@ const callRecords = ref([
   { no: 5, customerNumber: 'WRTC118', agent: 'Agent Zahra', campaign: 'collection', dateTime: '10 Sep 2026 07:05:33', duration: '00:02:45', lastCallStatus: 'SERVED', enqueueTime: '00:00:05', servedTime: '00:02:40', endCallTime: '10 Sep 2026 07:08:18' },
 ])
 
+// Filter Data Sesuai Input Header Filter
+const filteredCallRecords = computed(() => {
+  return callRecords.value.filter(item => {
+    const matchStatus = filterStatus.value === 'All Status' || item.lastCallStatus === filterStatus.value
+    const matchInput = !filterInput.value || item.customerNumber.toLowerCase().includes(filterInput.value.toLowerCase())
+    const matchCampaign = filterCampaign.value === 'All Campaign' || item.campaign === filterCampaign.value
+    const matchAgent = filterAgent.value === 'All Agent' || item.agent === filterAgent.value
+    return matchStatus && matchInput && matchCampaign && matchAgent
+  })
+})
+
+// FUNGSI DOWNLOAD FILE CSV
+const handleDownload = () => {
+  const currentRecords = filteredCallRecords.value
+
+  if (!currentRecords || currentRecords.length === 0) {
+    alert('Tidak ada data Call Records untuk di-download!')
+    return
+  }
+
+  // 1. Ambil Header kecuali kolom Action
+  const validHeaders = tableHeaders.filter(h => h.key !== 'action')
+  const headerRow = validHeaders.map(h => `"${h.title}"`).join(',')
+
+  // 2. Petakan Baris Data
+  const dataRows = currentRecords.map(row => {
+    return validHeaders
+      .map(h => {
+        let val = row[h.key]
+        val = val !== undefined && val !== null ? val : ''
+        return `"${String(val).replace(/"/g, '""')}"`
+      })
+      .join(',')
+  })
+
+  // 3. Gabung dan Trigger Pengunduhan
+  const csvContent = '\uFEFF' + [headerRow, ...dataRows].join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', 'Call_Reporting_Records.csv')
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 const getStatusColor = (status) => {
   switch (status) {
     case 'SERVED': return 'green-lighten-4 text-green-darken-3'
@@ -533,11 +559,8 @@ const openDetailModal = (item) => {
 
 <style scoped>
 .accent-bar { width: 3px; height: 16px; background-color: #1E75FF; border-radius: 2px; }
-.legend-box { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
-.center-text { position: absolute; pointer-events: none; }
 .leading-tight { line-height: 1.1; }
 
-/* Kelengkungan Ekstra Tumpul Presisi 24px */
 .custom-rounded {
   border-radius: 24px !important;
 }

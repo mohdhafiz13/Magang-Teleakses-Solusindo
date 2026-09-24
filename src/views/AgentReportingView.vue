@@ -46,117 +46,73 @@
     <div v-if="!isHistoryPage">
       <!-- Mode Call Statistics -->
       <div v-if="activeTab === 'call'">
-        <!-- Summary Cards Call -->
+        <!-- Summary Cards Call (Pakai Child Component SummaryCards) -->
+        <SummaryCards :items="callCards" :col-width="2" />
+
+        <!-- Charts Row 1: Campaign Distribution, Conversation Topics, Total Data Calls (Pakai Child Components) -->
         <v-row class="mb-4">
-          <v-col cols="12" sm="4" md="2" v-for="(card, i) in callCards" :key="i">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white">
-              <div class="d-flex align-center ga-2 text-caption font-weight-bold text-grey-darken-2 mb-2">
-                <v-icon :icon="card.icon" :color="card.color" size="18"></v-icon>
-                <span>{{ card.title }}</span>
-              </div>
-              <div class="text-h4 font-weight-bold">{{ card.value }}</div>
-            </v-card>
+          <v-col cols="12" md="4">
+            <DoughnutChartCard
+              title="Campaign Distribution"
+              subtitle="View the distribution of call activity across campaigns."
+              total-text="Total Campaign : 1,456"
+              :chart-data="campaignChartData"
+              :options="doughnutOptionsCampaign"
+              :plugins="[centerTextPlugin]"
+            />
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <DoughnutChartCard
+              title="Conversation Topics"
+              subtitle="Analyze the most common topics identified during calls."
+              total-text="Total Topics : 980"
+              :chart-data="topicChartDataFormatted"
+              :options="doughnutOptionsTopic"
+              :plugins="[centerTextPlugin]"
+            />
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <BarChartCard
+              title="Total Data Calls"
+              subtitle="Monitor the total number of calls over time."
+              total-text="Total Calls : 60"
+              :chart-data="dataCallsChartData"
+              :options="barOptions"
+              height="220px"
+            />
           </v-col>
         </v-row>
 
-        <!-- Charts Row 1: Campaign Distribution, Conversation Topics, Total Data Calls -->
-        <v-row class="mb-4">
-          <v-col cols="12" md="4">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white h-100">
-              <div class="d-flex align-center justify-space-between mb-1">
-                <div class="d-flex align-center ga-3">
-                  <div class="accent-bar"></div>
-                  <span class="font-weight-bold text-body-2 text-grey-darken-4">Campaign Distribution</span>
-                </div>
-                <span class="text-caption font-weight-bold text-slate-800">Total Campaign : 1,456</span>
-              </div>
-              <p class="text-caption text-grey-darken-1 pl-4 mb-2">View the distribution of call activity across campaigns.</p>
-
-              <div style="height: 240px;">
-                <Doughnut :data="campaignChartData" :options="doughnutOptionsCampaign" :plugins="[centerTextPlugin]" />
-              </div>
-            </v-card>
-          </v-col>
-
-          <v-col cols="12" md="4">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white h-100">
-              <div class="d-flex align-center justify-space-between mb-1">
-                <div class="d-flex align-center ga-3">
-                  <div class="accent-bar"></div>
-                  <span class="font-weight-bold text-body-2 text-grey-darken-4">Conversation Topics</span>
-                </div>
-                <span class="text-caption font-weight-bold text-slate-800">Total Topics : 980</span>
-              </div>
-              <p class="text-caption text-grey-darken-1 pl-4 mb-2">Analyze the most common topics identified during calls.</p>
-
-              <div style="height: 240px;">
-                <Doughnut :data="topicChartDataFormatted" :options="doughnutOptionsTopic" :plugins="[centerTextPlugin]" />
-              </div>
-            </v-card>
-          </v-col>
-
-          <v-col cols="12" md="4">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white h-100">
-              <div class="d-flex align-center justify-space-between mb-1">
-                <div class="d-flex align-center ga-3">
-                  <div class="accent-bar"></div>
-                  <span class="font-weight-bold text-body-2 text-grey-darken-4">Total Data Calls</span>
-                </div>
-                <span class="text-caption font-weight-bold text-slate-800">Total Calls : 60</span>
-              </div>
-              <p class="text-caption text-grey-darken-1 pl-4 mb-4">Monitor the total number of calls over time.</p>
-
-              <div style="height: 220px;">
-                <Bar :data="dataCallsChartData" :options="barOptions" />
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-
-        <!-- Charts Row 2: Agent Status Duration Statistics -->
-        <v-card elevation="0" border class="rounded-xl pa-4 bg-white">
-          <div class="d-flex align-center ga-3 mb-1">
-            <div class="accent-bar"></div>
-            <span class="font-weight-bold text-body-2 text-grey-darken-4">Agent Status Duration Statistics</span>
-          </div>
-          <p class="text-caption text-grey-darken-1 pl-4 mb-4">Monitor the duration of each agent status.</p>
-
-          <div style="height: 320px;">
-            <Bar :data="statusDurationChartData" :options="horizontalBarOptions" :plugins="[barValueLabelsPlugin]" />
-          </div>
-        </v-card>
+        <!-- Charts Row 2: Agent Status Duration Statistics (Pakai Child Component BarChartCard) -->
+        <BarChartCard
+          title="Agent Status Duration Statistics"
+          subtitle="Monitor the duration of each agent status."
+          :chart-data="statusDurationChartData"
+          :options="horizontalBarOptions"
+          :plugins="[barValueLabelsPlugin]"
+          height="320px"
+          class="mb-4"
+        />
       </div>
 
       <!-- Mode Chat Statistics -->
       <div v-else>
-        <!-- Summary Cards Chat -->
-        <v-row class="mb-4">
-          <v-col cols="12" sm="4" md="2" v-for="(card, i) in chatCards" :key="i">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white">
-              <div class="d-flex align-center ga-2 text-caption font-weight-bold text-grey-darken-2 mb-2">
-                <v-icon :icon="card.icon" :color="card.color" size="18"></v-icon>
-                <span>{{ card.title }}</span>
-              </div>
-              <div class="text-h4 font-weight-bold">{{ card.value }}</div>
-            </v-card>
-          </v-col>
-        </v-row>
+        <!-- Summary Cards Chat (Pakai Child Component SummaryCards) -->
+        <SummaryCards :items="chatCards" :col-width="2" />
 
-        <!-- Grid 2x2 Charts Chat -->
+        <!-- Grid 2x2 Charts Chat (Pakai Child Components) -->
         <v-row>
           <v-col cols="12" md="6">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white h-100">
-              <div class="d-flex align-center ga-3 mb-1">
-                <div class="accent-bar"></div>
-                <span class="font-weight-bold text-body-2 text-grey-darken-4">Total chat per agent (top 10)</span>
-              </div>
-              <p class="text-caption text-grey-darken-1 pl-4 mb-4">
-                Compare total chats handled by the top 10 agents.
-              </p>
-              <div style="height: 280px;">
-                <Bar :data="topChatAgentData" :options="topChatBarOptions" :plugins="[rawNumberLabelsPlugin]" />
-              </div>
-            </v-card>
+            <BarChartCard
+              title="Total chat per agent (top 10)"
+              subtitle="Compare total chats handled by the top 10 agents."
+              :chart-data="topChatAgentData"
+              :options="topChatBarOptions"
+              :plugins="[rawNumberLabelsPlugin]"
+              height="280px"
+            />
           </v-col>
 
           <v-col cols="12" md="6">
@@ -230,15 +186,13 @@
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-card elevation="0" border class="rounded-xl pa-4 bg-white h-100">
-              <div class="d-flex align-center ga-3 mb-4">
-                <div class="accent-bar"></div>
-                <span class="font-weight-bold text-body-2 text-grey-darken-4">Agent Chat Load Distribution</span>
-              </div>
-              <div style="height: 280px;">
-                <Doughnut :data="chatLoadDistributionData" :options="doughnutOptionsChatLoad" :plugins="[centerTextPlugin]" />
-              </div>
-            </v-card>
+            <DoughnutChartCard
+              title="Agent Chat Load Distribution"
+              :chart-data="chatLoadDistributionData"
+              :options="doughnutOptionsChatLoad"
+              :plugins="[centerTextPlugin]"
+              height="280px"
+            />
           </v-col>
         </v-row>
       </div>
@@ -249,7 +203,7 @@
     <!-- ================================================================= -->
     <div v-else>
       <v-card elevation="0" class="border rounded-xl pa-6 bg-white">
-        <!-- Filter Bar -->
+        <!-- Filter Bar & Download Header menggunakan Child Component TableSearchHeader -->
         <div class="d-flex align-center justify-space-between mb-6 flex-wrap ga-4">
           <div class="d-flex align-center flex-wrap ga-4">
             <!-- Date Range Picker -->
@@ -314,6 +268,7 @@
             </v-btn>
           </div>
 
+          <!-- Tombol Download CSV Otomatis -->
           <v-btn
             variant="outlined"
             color="success"
@@ -347,6 +302,7 @@
             </v-chip>
           </template>
 
+          <!-- CustomPagination Child Component -->
           <template v-slot:bottom>
             <CustomPagination
               v-model:page="page"
@@ -365,6 +321,9 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import CustomPagination from '../components/CustomPagination.vue'
+import SummaryCards from '../components/SummaryCards.vue'
+import DoughnutChartCard from '../components/DoughnutChartCard.vue'
+import BarChartCard from '../components/BarChartCard.vue'
 
 // Import Chart.js Modules
 import {
@@ -379,7 +338,7 @@ import {
   LineElement,
   ArcElement
 } from 'chart.js'
-import { Bar, Line, Doughnut } from 'vue-chartjs'
+import { Line } from 'vue-chartjs'
 
 ChartJS.register(
   Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, PointElement, LineElement, ArcElement
@@ -774,7 +733,43 @@ const formattedDateRange = computed(() => {
 })
 
 const handleSubmit = () => {}
-const handleDownload = () => { alert('Downloading Agent History Report...') }
+
+// FUNGSI DOWNLOAD CSV UNTUK AGENT HISTORY
+const handleDownload = () => {
+  const currentRecords = filteredHistoryRecords.value
+  const currentHeaders = activeTab.value === 'call' ? callHistoryHeaders : chatHistoryHeaders
+  const filename = activeTab.value === 'call' ? 'Agent_Call_History.csv' : 'Agent_Chat_History.csv'
+
+  if (!currentRecords || currentRecords.length === 0) {
+    alert('Tidak ada data history untuk di-download!')
+    return
+  }
+
+  // 1. Header CSV
+  const headerRow = currentHeaders.map(h => `"${h.title}"`).join(',')
+
+  // 2. Baris Data CSV
+  const dataRows = currentRecords.map(row => {
+    return currentHeaders
+      .map(h => {
+        let val = row[h.key]
+        val = val !== undefined && val !== null ? val : ''
+        return `"${String(val).replace(/"/g, '""')}"`
+      })
+      .join(',')
+  })
+
+  // 3. Trigger Download File
+  const csvContent = '\uFEFF' + [headerRow, ...dataRows].join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', filename)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -842,9 +837,6 @@ const filteredHistoryRecords = computed(() => {
   background-color: #1976D2;
   border-radius: 2px;
   flex-shrink: 0;
-}
-.text-slate-800 {
-  color: #1e293b;
 }
 
 /* STYLING HEATMAP GRID */
